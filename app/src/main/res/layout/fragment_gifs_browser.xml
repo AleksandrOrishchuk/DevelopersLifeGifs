@@ -12,8 +12,9 @@
             android:id="@+id/gifs_content_container"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:orientation="vertical"
+            android:layout_marginBottom="16dp"
             android:gravity="fill"
+            android:orientation="vertical"
             app:layout_constraintBottom_toTopOf="@+id/errorUI_container"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -23,28 +24,28 @@
                 android:id="@+id/loading_progress_bar"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:padding="64dp"
-                android:layout_gravity="center" />
+                android:layout_gravity="center"
+                android:padding="64dp" />
 
             <ImageView
                 android:id="@+id/gifs_image_view"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="4"
-                android:padding="4dp"
-                android:contentDescription="@string/gif_image_description"/>
+                android:contentDescription="@string/gif_image_description"
+                android:padding="4dp" />
 
             <TextView
                 android:id="@+id/gifs_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textStyle="bold"
                 android:gravity="bottom"
                 android:paddingStart="16dp"
                 android:paddingTop="8dp"
                 android:paddingEnd="16dp"
                 android:paddingBottom="8dp"
+                android:textStyle="bold"
                 tools:text="Image description" />
 
         </LinearLayout>
@@ -53,7 +54,7 @@
             android:id="@+id/errorUI_container"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginVertical="18dp"
+            android:layout_marginBottom="16dp"
             android:gravity="center"
             android:orientation="vertical"
             app:layout_constraintBottom_toTopOf="@+id/nav_buttons_container"
@@ -65,15 +66,15 @@
                 android:id="@+id/error_image_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_baseline_network_error_cloud"
-                android:contentDescription="@string/error_image_description"/>
+                android:contentDescription="@string/error_image_description"
+                android:src="@drawable/ic_baseline_network_error_cloud" />
 
             <TextView
                 android:id="@+id/error_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="18dp"
                 android:layout_gravity="center_horizontal"
+                android:padding="18dp"
                 android:text="@string/network_error_text"
                 android:textSize="24sp"
                 tools:text="Network Error" />
@@ -91,25 +92,26 @@
             android:id="@+id/nav_buttons_container"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:orientation="horizontal"
+            android:layout_marginBottom="16dp"
             android:gravity="center_horizontal"
+            android:orientation="horizontal"
             app:layout_constraintBottom_toTopOf="@+id/navigation_bar"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" >
+            app:layout_constraintStart_toStartOf="parent">
 
             <ImageButton
                 android:id="@+id/previous_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_baseline_previous_24"
-                android:contentDescription="@string/previous_button_description"/>
+                android:contentDescription="@string/previous_button_description"
+                android:src="@drawable/ic_baseline_previous_24" />
 
             <ImageButton
                 android:id="@+id/next_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_baseline_next_24"
-                android:contentDescription="@string/next_button_description"/>
+                android:contentDescription="@string/next_button_description"
+                android:src="@drawable/ic_baseline_next_24" />
 
         </LinearLayout>
 
@@ -120,6 +122,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:menu="@menu/navigation_menu"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

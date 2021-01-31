@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menu_random"
+        android:enabled="true"
+        android:icon="@drawable/ic_nav_random"
+        android:title="@string/menu_random_posts" />
+    <item
+        android:id="@+id/menu_top"
+        android:enabled="true"
+        android:icon="@drawable/ic_nav_top_rated"
+        android:title="@string/menu_top_posts" />
+    <item
+        android:id="@+id/menu_latest"
+        android:enabled="true"
+        android:icon="@drawable/ic_nav_latest"
+        android:title="@string/menu_latest_posts" />
+</menu>

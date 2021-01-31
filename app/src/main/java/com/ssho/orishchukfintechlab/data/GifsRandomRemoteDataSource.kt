@@ -9,8 +9,9 @@ import kotlinx.coroutines.Dispatchers
 
 class GifsRandomRemoteDataSource(private val developersLifeApi: DevelopersLifeApi,
                                  private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
-                                 private val apiRequestHandler: ApiRequestHandler) {
-    suspend fun fetchImageData(): ResultWrapper<ImageData> {
+                                 private val apiRequestHandler: ApiRequestHandler
+                                 ) : GifsRemoteDataSource {
+    override suspend fun fetchImageData(): ResultWrapper<List<ImageData>> {
         return apiRequestHandler.handleApiRequest(dispatcher) {
             val imageApiDTO = fetchImageApiDTO()
             parseImageApiDTO(imageApiDTO)
@@ -21,13 +22,13 @@ class GifsRandomRemoteDataSource(private val developersLifeApi: DevelopersLifeAp
         return developersLifeApi.fetchRandomImageData()
     }
 
-    private fun parseImageApiDTO(imageApiDTO: ImageApiDTO): ImageData {
+    private fun parseImageApiDTO(imageApiDTO: ImageApiDTO): List<ImageData> {
         val gifDescription = imageApiDTO.description
         val gifURL = imageApiDTO.gifURL.replace("http://", "https://")
 
-        return ImageData(
+        return listOf(ImageData(
             description = gifDescription,
-            gifURL = gifURL
+            gifURL = gifURL)
         )
     }
 }

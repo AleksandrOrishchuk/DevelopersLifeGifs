@@ -7,4 +7,7 @@
     <string name="generic_error_text">Unexpected error occurred. We are working on this bug.</string>
     <string name="gif_image_description">A gif image.</string>
     <string name="error_image_description">Error occurred.</string>
+    <string name="menu_random_posts">Random posts</string>
+    <string name="menu_top_posts">Top posts</string>
+    <string name="menu_latest_posts">Latest posts</string>
 </resources>

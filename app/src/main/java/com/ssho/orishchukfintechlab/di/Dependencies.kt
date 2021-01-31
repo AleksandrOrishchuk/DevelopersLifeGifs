@@ -19,26 +19,58 @@ private val apiRequestHandler: ApiRequestHandler by lazy {
     ApiRequestHandler()
 }
 
-private val gifsRandomRemoteDataSource: GifsRandomRemoteDataSource by lazy {
+private val gifsRandomRemoteDataSource: GifsRemoteDataSource by lazy {
     GifsRandomRemoteDataSource(
         developersLifeApi = developersLifeApi,
         apiRequestHandler = apiRequestHandler
     )
 }
 
-private val gifsRandomLocalDataSource: GifsRandomLocalDataSource by lazy {
-    GifsRandomLocalDataSource()
+private val gifsTopRemoteDataSource: GifsRemoteDataSource by lazy {
+    GifsTopRemoteDataSource(
+        developersLifeApi = developersLifeApi,
+        apiRequestHandler = apiRequestHandler
+    )
 }
 
-private val gifsRandomRepository: GifsRandomRepository by lazy {
-    GifsRandomRepository(
-        gifsRandomRemoteDataSource,
-        gifsRandomLocalDataSource
+private val gifsLatestRemoteDataSource: GifsRemoteDataSource by lazy {
+    GifsLatestRemoteDataSource(
+        developersLifeApi = developersLifeApi,
+        apiRequestHandler = apiRequestHandler
+    )
+}
+
+private val gifsRandomRepository: GifsRepository by lazy {
+    GifsRepositoryImpl(
+        gifsRemoteDataSource = gifsRandomRemoteDataSource,
+        gifsLocalDataSource = GifsLocalDataSourceImpl()
+    )
+}
+
+private val gifsTopRepository: GifsRepository by lazy {
+    GifsRepositoryImpl(
+        gifsRemoteDataSource = gifsTopRemoteDataSource,
+        gifsLocalDataSource = GifsLocalDataSourceImpl()
+    )
+}
+
+private val gifsLatestRepository: GifsRepository by lazy {
+    GifsRepositoryImpl(
+        gifsRemoteDataSource = gifsLatestRemoteDataSource,
+        gifsLocalDataSource = GifsLocalDataSourceImpl()
+    )
+}
+
+private val gifRepositoryProvider: GifRepositoryProvider by lazy {
+    GifRepositoryProvider(
+        gifsRandomRepository = gifsRandomRepository,
+        gifsTopRepository = gifsTopRepository,
+        gifsLatestRepository = gifsLatestRepository
     )
 }
 
 internal fun provideGifsBrowserViewModelFactory(): GifsBrowserFragmentViewModelFactory {
     return GifsBrowserFragmentViewModelFactory(
-        GifsBrowserInteractor(gifsRandomRepository)
+        gifsRepositoryProvider = gifRepositoryProvider
     )
 }

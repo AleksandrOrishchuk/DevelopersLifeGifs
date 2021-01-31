@@ -62,12 +62,29 @@ class GifsBrowserFragment : Fragment() {
                 viewModel.onLoadNextGIFClick()
             }
 
+            navigationBar.setOnNavigationItemSelectedListener {
+                return@setOnNavigationItemSelectedListener when (it.itemId) {
+                    R.id.menu_random -> viewModel.onMenuTabSelected(TAB_RANDOM)
+                    R.id.menu_top -> viewModel.onMenuTabSelected(TAB_TOP)
+                    R.id.menu_latest -> viewModel.onMenuTabSelected(TAB_LATEST)
+                    else -> false
+                }
+            }
         }
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         fragmentBinding.apply {
+
+            viewModel.currentMenuTab.observe(viewLifecycleOwner) { menuTab ->
+                navigationBar.selectedItemId = when (menuTab) {
+                    TAB_RANDOM -> R.id.menu_random
+                    TAB_TOP -> R.id.menu_top
+                    TAB_LATEST -> R.id.menu_latest
+                    else -> R.id.menu_random
+                }
+            }
 
             viewModel.viewState.observe(viewLifecycleOwner) { viewState ->
                 viewState.isPreviousButtonEnabled.also {
@@ -101,7 +118,6 @@ class GifsBrowserFragment : Fragment() {
                         .into(gifsImageView)
                 }
             }
-
         }
     }
 
@@ -110,6 +126,7 @@ class GifsBrowserFragment : Fragment() {
             errorUIContainer.isVisible = hasErrorOccurred
             gifsContentContainer.isVisible = !hasErrorOccurred
             navButtonsContainer.isVisible = !hasErrorOccurred
+            navigationBar.isVisible = !hasErrorOccurred
         }
     }
 }

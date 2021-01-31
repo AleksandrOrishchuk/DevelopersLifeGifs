@@ -2,12 +2,10 @@ package com.ssho.orishchukfintechlab.data
 
 import com.ssho.orishchukfintechlab.data.model.ImageData
 
-interface GifsRepository {
-    suspend fun getNextGif(): ResultWrapper<ImageData>
-
+interface GifsLocalDataSource {
     fun getPreviousGif(): ResultWrapper<ImageData>
-
-    suspend fun getCurrentGif(): ResultWrapper<ImageData>
-
+    fun getNextGif(): ResultWrapper<ImageData>
+    fun getCurrentGif(): ResultWrapper<ImageData>
+    fun cacheImageData(imageData: ImageData)
     fun isPreviousGifCached(): Boolean
 }
