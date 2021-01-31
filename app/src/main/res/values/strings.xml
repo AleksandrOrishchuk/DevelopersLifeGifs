@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Developers Life Gifs</string>
+    <string name="previous_button_description">Show previous picture</string>
+    <string name="next_button_description">Show next picture</string>
+    <string name="try_again_button_text">Try again</string>
+    <string name="network_error_text">Network error occurred. Check your network connection.</string>
+    <string name="generic_error_text">Unexpected error occurred. We are working on this bug.</string>
+    <string name="gif_image_description">A gif image.</string>
+    <string name="error_image_description">Error occurred.</string>
+</resources>
