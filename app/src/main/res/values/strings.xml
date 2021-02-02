@@ -5,6 +5,7 @@
     <string name="try_again_button_text">Try again</string>
     <string name="network_error_text">Network error occurred. Check your network connection.</string>
     <string name="generic_error_text">Unexpected error occurred. We are working on this bug.</string>
+    <string name="empty"/>
     <string name="gif_image_description">A gif image.</string>
     <string name="error_image_description">Error occurred.</string>
     <string name="menu_random_posts">Random posts</string>

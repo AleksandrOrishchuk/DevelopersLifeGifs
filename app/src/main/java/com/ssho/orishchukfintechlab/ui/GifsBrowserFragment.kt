@@ -92,16 +92,12 @@ class GifsBrowserFragment : Fragment() {
                     previousButton.isClickable = it
                 }
 
-                viewState.isNetworkError.also { isNetworkError ->
-                    changeViewsVisibilityOnError(isNetworkError)
-                    if (isNetworkError)
-                        errorTitle.setText(R.string.network_error_text)
-                }
-
-                viewState.isGenericError.also { isGenericError ->
-                    changeViewsVisibilityOnError(isGenericError)
-                    if (isGenericError)
-                        errorTitle.setText(R.string.generic_error_text)
+                viewState.hasErrorOccurred.also {
+                    changeViewsVisibilityOnError(hasErrorOccurred = it)
+                    if (it) {
+                        val errorMessage = getErrorMessageResId(viewState)
+                        errorTitle.setText(errorMessage)
+                    }
                 }
 
                 loadingProgressBar.isVisible = viewState.isLoading
@@ -120,6 +116,13 @@ class GifsBrowserFragment : Fragment() {
             }
         }
     }
+
+    private fun getErrorMessageResId(viewState: GifsBrowserViewState) =
+        when {
+            viewState.isNetworkError -> R.string.network_error_text
+            viewState.isGenericError -> R.string.generic_error_text
+            else -> R.string.empty
+        }
 
     private fun changeViewsVisibilityOnError(hasErrorOccurred: Boolean) {
         fragmentBinding.apply {

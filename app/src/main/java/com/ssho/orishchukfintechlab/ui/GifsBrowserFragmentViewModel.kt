@@ -78,8 +78,7 @@ class GifsBrowserFragmentViewModel(
                 updateViewState(
                     _viewState.value?.copy(
                         isLoading = false,
-                        isNetworkError = false,
-                        isGenericError = false,
+                        hasErrorOccurred = false,
                         gifImageData = result.value,
                         isPreviousButtonEnabled = gifsRepository.isPreviousGifCached()
                     )
@@ -88,6 +87,7 @@ class GifsBrowserFragmentViewModel(
                 updateViewState(
                     _viewState.value?.copy(
                         isLoading = false,
+                        hasErrorOccurred = true,
                         isNetworkError = true,
                         isGenericError = false
                     )
@@ -96,6 +96,7 @@ class GifsBrowserFragmentViewModel(
                 updateViewState(
                     _viewState.value?.copy(
                         isLoading = false,
+                        hasErrorOccurred = true,
                         isNetworkError = false,
                         isGenericError = true
                     )
@@ -121,6 +122,7 @@ class GifsBrowserFragmentViewModelFactory(
 data class GifsBrowserViewState(
     val isLoading: Boolean = false,
     val gifImageData: ImageData = ImageData(),
+    val hasErrorOccurred: Boolean = false,
     val isNetworkError: Boolean = false,
     val isGenericError: Boolean = false,
     val isPreviousButtonEnabled: Boolean = false
