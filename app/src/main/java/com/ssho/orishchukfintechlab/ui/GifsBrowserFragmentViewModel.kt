@@ -1,24 +1,27 @@
 package com.ssho.orishchukfintechlab.ui
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.*
 import com.ssho.orishchukfintechlab.data.GifRepositoryProvider
 import com.ssho.orishchukfintechlab.data.ResultWrapper
 import com.ssho.orishchukfintechlab.data.model.ImageData
+import com.ssho.orishchukfintechlab.R
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class GifsBrowserFragmentViewModel(
     private val gifsRepositoryProvider: GifRepositoryProvider,
-    private val dispatcher: CoroutineDispatcher
+    private val dispatcher: CoroutineDispatcher,
+    initialMenuTab: String = TAB_RANDOM
     ) : ViewModel() {
 
     val viewState: LiveData<GifsBrowserViewState> get() = _viewState
-    val currentMenuTab: LiveData<String> get() = _currentMenuTab
-    private val _viewState = MutableLiveData(GifsBrowserViewState())
-    private val _currentMenuTab = MutableLiveData(TAB_RANDOM)
+    val currentMenuTab: String get() = _currentMenuTab
+    private val _viewState: MutableLiveData<GifsBrowserViewState> = MutableLiveData(GifsBrowserViewState.Loading)
+    private var _currentMenuTab = initialMenuTab
 
-    private var gifsRepository = gifsRepositoryProvider.getGifRepository(TAB_RANDOM)
+    private var gifsRepository = gifsRepositoryProvider.getGifRepository(initialMenuTab)
 
     init {
         onLoadNextGIFClick()
@@ -26,7 +29,7 @@ class GifsBrowserFragmentViewModel(
 
     fun onLoadNextGIFClick() {
         viewModelScope.launch(dispatcher) {
-            updateViewState(_viewState.value?.copy(isLoading = true))
+            postLoadingViewState()
 
             val imageDataResponse = gifsRepository.getNextGif()
             unwrapImageDataResponse(imageDataResponse)
@@ -34,7 +37,7 @@ class GifsBrowserFragmentViewModel(
     }
 
     fun onLoadPreviousGIFClick() {
-        updateViewState(_viewState.value?.copy(isLoading = true))
+        postLoadingViewState()
 
         val imageDataResponse = gifsRepository.getPreviousGif()
         unwrapImageDataResponse(imageDataResponse)
@@ -42,15 +45,13 @@ class GifsBrowserFragmentViewModel(
 
 
     fun onMenuTabSelected(newMenuTab: String): Boolean {
-        val currentMenuTab = currentMenuTab.value
-
         if (newMenuTab == currentMenuTab)
             return false
 
         updateGifsRepository(newMenuTab)
         loadCurrentGIF()
 
-        _currentMenuTab.value = newMenuTab
+        _currentMenuTab = newMenuTab
 
         return true
     }
@@ -61,47 +62,35 @@ class GifsBrowserFragmentViewModel(
 
     private fun loadCurrentGIF() {
         viewModelScope.launch(dispatcher) {
-            updateViewState(_viewState.value?.copy(isLoading = true))
+            postLoadingViewState()
 
             val imageDataResponse = gifsRepository.getCurrentGif()
             unwrapImageDataResponse(imageDataResponse)
         }
     }
 
-    private fun updateViewState(newViewState: GifsBrowserViewState?) {
-        _viewState.postValue(newViewState)
-    }
-
     private fun unwrapImageDataResponse(result: ResultWrapper<ImageData>) {
         when (result) {
             is ResultWrapper.Success ->
-                updateViewState(
-                    _viewState.value?.copy(
-                        isLoading = false,
-                        hasErrorOccurred = false,
-                        gifImageData = result.value,
-                        isPreviousButtonEnabled = gifsRepository.isPreviousGifCached()
-                    )
+                _viewState.postValue(
+                        GifsBrowserViewState.Result(
+                                gifImageData = result.value,
+                                isPreviousButtonEnabled = gifsRepository.isPreviousGifCached()
+                        )
                 )
             is ResultWrapper.NetworkError ->
-                updateViewState(
-                    _viewState.value?.copy(
-                        isLoading = false,
-                        hasErrorOccurred = true,
-                        isNetworkError = true,
-                        isGenericError = false
-                    )
+                _viewState.postValue(
+                        GifsBrowserViewState.Error(R.string.network_error_text)
                 )
             is ResultWrapper.GenericError ->
-                updateViewState(
-                    _viewState.value?.copy(
-                        isLoading = false,
-                        hasErrorOccurred = true,
-                        isNetworkError = false,
-                        isGenericError = true
-                    )
+                _viewState.postValue(
+                        GifsBrowserViewState.Error(R.string.generic_error_text)
                 )
         }
+    }
+
+    private fun postLoadingViewState() {
+        _viewState.postValue(GifsBrowserViewState.Loading)
     }
 
 }
@@ -119,11 +108,10 @@ class GifsBrowserFragmentViewModelFactory(
     }
 }
 
-data class GifsBrowserViewState(
-    val isLoading: Boolean = false,
-    val gifImageData: ImageData = ImageData(),
-    val hasErrorOccurred: Boolean = false,
-    val isNetworkError: Boolean = false,
-    val isGenericError: Boolean = false,
-    val isPreviousButtonEnabled: Boolean = false
-)
+sealed class GifsBrowserViewState {
+    data class Result(
+            val gifImageData: ImageData = ImageData(),
+            val isPreviousButtonEnabled: Boolean = false) : GifsBrowserViewState()
+    data class Error(@StringRes val message: Int) : GifsBrowserViewState()
+    object Loading : GifsBrowserViewState()
+}

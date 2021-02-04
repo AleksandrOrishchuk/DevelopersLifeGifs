@@ -75,61 +75,51 @@ class GifsBrowserFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        fragmentBinding.apply {
 
-            viewModel.currentMenuTab.observe(viewLifecycleOwner) { menuTab ->
-                navigationBar.selectedItemId = when (menuTab) {
-                    TAB_RANDOM -> R.id.menu_random
-                    TAB_TOP -> R.id.menu_top
-                    TAB_LATEST -> R.id.menu_latest
-                    else -> R.id.menu_random
-                }
-            }
-
-            viewModel.viewState.observe(viewLifecycleOwner) { viewState ->
-                viewState.isPreviousButtonEnabled.also {
-                    previousButton.isEnabled = it
-                    previousButton.isClickable = it
-                }
-
-                viewState.hasErrorOccurred.also {
-                    changeViewsVisibilityOnError(hasErrorOccurred = it)
-                    if (it) {
-                        val errorMessage = getErrorMessageResId(viewState)
-                        errorTitle.setText(errorMessage)
-                    }
-                }
-
-                loadingProgressBar.isVisible = viewState.isLoading
-
-                gifsTitle.text = viewState.gifImageData.description
-
-                viewState.gifImageData.gifURL.also {
-                    Log.d(TAG, "Current GIF url: $it")
-
-                    Glide.with(requireContext())
-                        .load(it)
-                        .placeholder(R.drawable.progress_bar)
-                        .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-                        .into(gifsImageView)
-                }
-            }
+        fragmentBinding.navigationBar.selectedItemId = when (viewModel.currentMenuTab) {
+            TAB_RANDOM -> R.id.menu_random
+            TAB_TOP -> R.id.menu_top
+            TAB_LATEST -> R.id.menu_latest
+            else -> R.id.menu_random
         }
+
+        viewModel.viewState.observe(viewLifecycleOwner) { viewState ->
+            applyViewState(viewState)
+        }
+
     }
 
-    private fun getErrorMessageResId(viewState: GifsBrowserViewState) =
-        when {
-            viewState.isNetworkError -> R.string.network_error_text
-            viewState.isGenericError -> R.string.generic_error_text
-            else -> R.string.empty
-        }
-
-    private fun changeViewsVisibilityOnError(hasErrorOccurred: Boolean) {
+    private fun applyViewState(viewState: GifsBrowserViewState) {
         fragmentBinding.apply {
-            errorUIContainer.isVisible = hasErrorOccurred
-            gifsContentContainer.isVisible = !hasErrorOccurred
-            navButtonsContainer.isVisible = !hasErrorOccurred
-            navigationBar.isVisible = !hasErrorOccurred
+
+            gifsContentContainer.isVisible = viewState is GifsBrowserViewState.Result
+            navButtonsContainer.isVisible = viewState is GifsBrowserViewState.Result
+
+            errorUIContainer.isVisible = viewState is GifsBrowserViewState.Error
+            loadingProgressBar.isVisible = viewState is GifsBrowserViewState.Loading
+
+
+            when (viewState) {
+                is GifsBrowserViewState.Result -> {
+                    previousButton.isEnabled = viewState.isPreviousButtonEnabled
+                    previousButton.isClickable = viewState.isPreviousButtonEnabled
+
+                    gifsTitle.text = viewState.gifImageData.description
+
+                    viewState.gifImageData.gifURL.also {
+                        Log.d(TAG, "Current GIF url: $it")
+
+                        Glide.with(requireContext())
+                                .load(it)
+                                .placeholder(R.drawable.progress_bar)
+                                .error(R.drawable.ic_baseline_network_error_cloud)
+                                .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                                .into(gifsImageView)
+                    }
+                }
+                is GifsBrowserViewState.Error -> errorTitle.setText(viewState.message)
+                GifsBrowserViewState.Loading -> loadingProgressBar
+            }
         }
     }
 }
