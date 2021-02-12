@@ -1,11 +1,18 @@
 package com.ssho.orishchukfintechlab.di
 
+import android.annotation.SuppressLint
+import android.content.Context
 import com.ssho.orishchukfintechlab.data.*
 import com.ssho.orishchukfintechlab.data.api.ApiRequestHandler
 import com.ssho.orishchukfintechlab.data.api.DevelopersLifeApi
+import com.ssho.orishchukfintechlab.data.ImageDataMapper
+import com.ssho.orishchukfintechlab.data.database.SavedGifsDatabase
 import com.ssho.orishchukfintechlab.ui.GifsBrowserFragmentViewModelFactory
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+
+@SuppressLint("StaticFieldLeak")
+lateinit var androidContext: Context
 
 private val developersLifeApi: DevelopersLifeApi by lazy {
     val retrofit = Retrofit.Builder()
@@ -61,16 +68,29 @@ private val gifsLatestRepository: GifsRepository by lazy {
     )
 }
 
-private val gifRepositoryProvider: GifRepositoryProvider by lazy {
-    GifRepositoryProvider(
+private val gifSavedRepository: GifsRepositoryWDatabase by lazy {
+    val savedGifsDatabase = SavedGifsDatabase.getExchangeRatesDatabase(androidContext)
+    val savedGifsDao = savedGifsDatabase.savedGifsDao()
+
+    GifsSavedRepository(
+        GifsSavedLocalDataSource(
+            savedGifsDao = savedGifsDao,
+            imageDataMapper = ImageDataMapper()
+        )
+    )
+}
+
+private val gifsRepositoryProvider: GifsRepositoryProvider by lazy {
+    GifsRepositoryProvider(
         gifsRandomRepository = gifsRandomRepository,
         gifsTopRepository = gifsTopRepository,
-        gifsLatestRepository = gifsLatestRepository
+        gifsLatestRepository = gifsLatestRepository,
+        gifsSavedRepository = gifSavedRepository
     )
 }
 
 internal fun provideGifsBrowserViewModelFactory(): GifsBrowserFragmentViewModelFactory {
     return GifsBrowserFragmentViewModelFactory(
-        gifsRepositoryProvider = gifRepositoryProvider
+        gifsRepositoryProvider = gifsRepositoryProvider
     )
 }

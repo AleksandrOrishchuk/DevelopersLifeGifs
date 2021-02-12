@@ -12,7 +12,13 @@
         android:title="@string/menu_top_posts" />
     <item
         android:id="@+id/menu_latest"
-        android:enabled="true"
+        android:enabled="false"
+        android:visible="false"
         android:icon="@drawable/ic_nav_latest"
         android:title="@string/menu_latest_posts" />
+    <item
+        android:id="@+id/menu_liked"
+        android:enabled="true"
+        android:icon="@drawable/ic_nav_liked"
+        android:title="@string/menu_liked_posts" />
 </menu>

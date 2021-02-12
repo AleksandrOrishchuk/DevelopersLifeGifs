@@ -63,12 +63,14 @@ class GifsBrowserFragment : Fragment() {
             }
 
             navigationBar.setOnNavigationItemSelectedListener {
-                return@setOnNavigationItemSelectedListener when (it.itemId) {
-                    R.id.menu_random -> viewModel.onMenuTabSelected(TAB_RANDOM)
-                    R.id.menu_top -> viewModel.onMenuTabSelected(TAB_TOP)
-                    R.id.menu_latest -> viewModel.onMenuTabSelected(TAB_LATEST)
-                    else -> false
-                }
+                return@setOnNavigationItemSelectedListener viewModel.onMenuTabSelected(it.itemId)
+            }
+
+            likedCheckbox.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked)
+                    viewModel.onLikeCurrentGIFClick()
+                else
+                    viewModel.onDislikeCurrentGIFClick()
             }
         }
     }
@@ -76,12 +78,7 @@ class GifsBrowserFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        fragmentBinding.navigationBar.selectedItemId = when (viewModel.currentMenuTab) {
-            TAB_RANDOM -> R.id.menu_random
-            TAB_TOP -> R.id.menu_top
-            TAB_LATEST -> R.id.menu_latest
-            else -> R.id.menu_random
-        }
+        fragmentBinding.navigationBar.selectedItemId = viewModel.currentMenuTab
 
         viewModel.viewState.observe(viewLifecycleOwner) { viewState ->
             applyViewState(viewState)
@@ -103,6 +100,8 @@ class GifsBrowserFragment : Fragment() {
                 is GifsBrowserViewState.Result -> {
                     previousButton.isEnabled = viewState.isPreviousButtonEnabled
                     previousButton.isClickable = viewState.isPreviousButtonEnabled
+                    nextButton.isEnabled = viewState.isNextButtonEnabled
+                    likedCheckbox.isChecked = viewState.isCurrentGifLiked
 
                     gifsTitle.text = viewState.gifImageData.description
 
@@ -117,7 +116,11 @@ class GifsBrowserFragment : Fragment() {
                                 .into(gifsImageView)
                     }
                 }
-                is GifsBrowserViewState.Error -> errorTitle.setText(viewState.message)
+                is GifsBrowserViewState.Error -> {
+                    errorTitle.setText(viewState.message)
+                    errorImageView.setImageResource(viewState.drawableRes)
+                    tryAgainButton.isVisible = viewState.isRetryAvailable
+                }
                 GifsBrowserViewState.Loading -> loadingProgressBar
             }
         }

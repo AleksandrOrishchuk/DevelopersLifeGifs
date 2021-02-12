@@ -6,6 +6,8 @@ interface GifsLocalDataSource {
     fun getPreviousGif(): ResultWrapper<ImageData>
     fun getNextGif(): ResultWrapper<ImageData>
     fun getCurrentGif(): ResultWrapper<ImageData>
+    fun getLastGif(): ResultWrapper<ImageData>
     fun cacheImageData(imageData: ImageData)
     fun isPreviousGifCached(): Boolean
+    fun isNextGifCached(): Boolean
 }

@@ -5,10 +5,12 @@
     <string name="try_again_button_text">Try again</string>
     <string name="network_error_text">Network error occurred. Check your network connection.</string>
     <string name="generic_error_text">Unexpected error occurred. We are working on this bug.</string>
+    <string name="no_liked_posts_error_text">Oops. It seems that you haven\'t liked any posts yet!</string>
     <string name="empty"/>
     <string name="gif_image_description">A gif image.</string>
     <string name="error_image_description">Error occurred.</string>
     <string name="menu_random_posts">Random posts</string>
     <string name="menu_top_posts">Top posts</string>
     <string name="menu_latest_posts">Latest posts</string>
+    <string name="menu_liked_posts">Liked posts</string>
 </resources>

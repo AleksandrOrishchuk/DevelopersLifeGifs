@@ -9,5 +9,9 @@ interface GifsRepository {
 
     suspend fun getCurrentGif(): ResultWrapper<ImageData>
 
+    fun getLastGif(): ResultWrapper<ImageData>
+
     fun isPreviousGifCached(): Boolean
+
+    fun isNextGifCached(): Boolean
 }

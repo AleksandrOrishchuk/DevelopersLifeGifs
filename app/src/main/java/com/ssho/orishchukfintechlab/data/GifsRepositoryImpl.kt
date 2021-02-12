@@ -2,20 +2,20 @@ package com.ssho.orishchukfintechlab.data
 
 import com.ssho.orishchukfintechlab.data.model.ImageData
 
-class GifsRepositoryImpl(private val gifsRemoteDataSource: GifsRemoteDataSource,
-                         private val gifsLocalDataSource: GifsLocalDataSource
-                        ) : GifsRepository {
+class GifsRepositoryImpl(
+    private val gifsRemoteDataSource: GifsRemoteDataSource,
+    private val gifsLocalDataSource: GifsLocalDataSource
+) : GifsRepository {
 
     override suspend fun getNextGif(): ResultWrapper<ImageData> {
         val cachedResult = getNextGifFromLocal()
-
         if (cachedResult is ResultWrapper.Success)
             return cachedResult
 
         val fetchedResult = getNextGifsFromRemote()
-
         if (fetchedResult is ResultWrapper.Success) {
             cacheGifListToLocal(fetchedResult.value)
+
             return getNextGifFromLocal()
         }
 
@@ -31,7 +31,6 @@ class GifsRepositoryImpl(private val gifsRemoteDataSource: GifsRemoteDataSource,
 
     override suspend fun getCurrentGif(): ResultWrapper<ImageData> {
         val currentResult = gifsLocalDataSource.getCurrentGif()
-
         if (currentResult is ResultWrapper.Success)
             return currentResult
 
@@ -39,6 +38,12 @@ class GifsRepositoryImpl(private val gifsRemoteDataSource: GifsRemoteDataSource,
     }
 
     override fun isPreviousGifCached(): Boolean = gifsLocalDataSource.isPreviousGifCached()
+
+    override fun isNextGifCached(): Boolean = gifsLocalDataSource.isNextGifCached()
+
+    override fun getLastGif(): ResultWrapper<ImageData> {
+        return gifsLocalDataSource.getLastGif()
+    }
 
     private suspend fun getNextGifsFromRemote(): ResultWrapper<List<ImageData>> {
         return gifsRemoteDataSource.fetchImageData()

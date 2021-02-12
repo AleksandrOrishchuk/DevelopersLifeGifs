@@ -106,6 +106,14 @@
                 android:contentDescription="@string/previous_button_description"
                 android:src="@drawable/ic_baseline_previous_24" />
 
+            <CheckBox
+                android:id="@+id/liked_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:button="@drawable/selector_like"
+                android:layout_gravity="center"
+                android:layout_marginHorizontal="8dp"/>
+
             <ImageButton
                 android:id="@+id/next_button"
                 android:layout_width="wrap_content"
