@@ -6,6 +6,7 @@ import com.ssho.orishchukfintechlab.data.*
 import com.ssho.orishchukfintechlab.data.api.ApiRequestHandler
 import com.ssho.orishchukfintechlab.data.api.DevelopersLifeApi
 import com.ssho.orishchukfintechlab.data.ImageDataMapper
+import com.ssho.orishchukfintechlab.data.cache.ImageDataCache
 import com.ssho.orishchukfintechlab.data.database.SavedGifsDatabase
 import com.ssho.orishchukfintechlab.ui.GifsBrowserFragmentViewModelFactory
 import retrofit2.Retrofit
@@ -24,6 +25,10 @@ private val developersLifeApi: DevelopersLifeApi by lazy {
 
 private val apiRequestHandler: ApiRequestHandler by lazy {
     ApiRequestHandler()
+}
+
+private val dataRequestHandler: DataRequestHandler by lazy {
+    DataRequestHandler()
 }
 
 private val gifsRandomRemoteDataSource: GifsRemoteDataSource by lazy {
@@ -50,30 +55,31 @@ private val gifsLatestRemoteDataSource: GifsRemoteDataSource by lazy {
 private val gifsRandomRepository: GifsRepository by lazy {
     GifsRepositoryImpl(
         gifsRemoteDataSource = gifsRandomRemoteDataSource,
-        gifsLocalDataSource = GifsLocalDataSourceImpl()
+        gifsLocalDataSource = GifsLocalDataSourceImpl(ImageDataCache(), dataRequestHandler)
     )
 }
 
 private val gifsTopRepository: GifsRepository by lazy {
     GifsRepositoryImpl(
         gifsRemoteDataSource = gifsTopRemoteDataSource,
-        gifsLocalDataSource = GifsLocalDataSourceImpl()
+        gifsLocalDataSource = GifsLocalDataSourceImpl(ImageDataCache(), dataRequestHandler)
     )
 }
 
 private val gifsLatestRepository: GifsRepository by lazy {
     GifsRepositoryImpl(
         gifsRemoteDataSource = gifsLatestRemoteDataSource,
-        gifsLocalDataSource = GifsLocalDataSourceImpl()
+        gifsLocalDataSource = GifsLocalDataSourceImpl(ImageDataCache(), dataRequestHandler)
     )
 }
 
-private val gifSavedRepository: GifsRepositoryWDatabase by lazy {
+private val gifLikedRepository: GifsRepositoryStoreable by lazy {
     val savedGifsDatabase = SavedGifsDatabase.getExchangeRatesDatabase(androidContext)
     val savedGifsDao = savedGifsDatabase.savedGifsDao()
-
-    GifsSavedRepository(
-        GifsSavedLocalDataSource(
+    GifsLikedRepository(
+        GifsLikedLocalDataSource(
+            gifsCache = ImageDataCache(),
+            dataRequestHandler = dataRequestHandler,
             savedGifsDao = savedGifsDao,
             imageDataMapper = ImageDataMapper()
         )
@@ -85,7 +91,7 @@ private val gifsRepositoryProvider: GifsRepositoryProvider by lazy {
         gifsRandomRepository = gifsRandomRepository,
         gifsTopRepository = gifsTopRepository,
         gifsLatestRepository = gifsLatestRepository,
-        gifsSavedRepository = gifSavedRepository
+        gifsLikedRepository = gifLikedRepository
     )
 }
 

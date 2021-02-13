@@ -41,7 +41,8 @@ class GifsBrowserFragment : Fragment() {
             inflater,
             R.layout.fragment_gifs_browser,
             container,
-            false)
+            false
+        )
 
         return fragmentBinding.root
     }
@@ -63,8 +64,10 @@ class GifsBrowserFragment : Fragment() {
             }
 
             navigationBar.setOnNavigationItemSelectedListener {
-                return@setOnNavigationItemSelectedListener viewModel.onMenuTabSelected(it.itemId)
+                viewModel.onMenuTabSelected(it.itemId)
             }
+
+            navigationBar.selectedItemId = viewModel.currentMenuTab
 
             likedCheckbox.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked)
@@ -77,8 +80,6 @@ class GifsBrowserFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-
-        fragmentBinding.navigationBar.selectedItemId = viewModel.currentMenuTab
 
         viewModel.viewState.observe(viewLifecycleOwner) { viewState ->
             applyViewState(viewState)
@@ -101,6 +102,7 @@ class GifsBrowserFragment : Fragment() {
                     previousButton.isEnabled = viewState.isPreviousButtonEnabled
                     previousButton.isClickable = viewState.isPreviousButtonEnabled
                     nextButton.isEnabled = viewState.isNextButtonEnabled
+                    nextButton.isClickable = viewState.isNextButtonEnabled
                     likedCheckbox.isChecked = viewState.isCurrentGifLiked
 
                     gifsTitle.text = viewState.gifImageData.description
@@ -109,11 +111,11 @@ class GifsBrowserFragment : Fragment() {
                         Log.d(TAG, "Current GIF url: $it")
 
                         Glide.with(requireContext())
-                                .load(it)
-                                .placeholder(R.drawable.progress_bar)
-                                .error(R.drawable.ic_baseline_network_error_cloud)
-                                .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-                                .into(gifsImageView)
+                            .load(it)
+                            .placeholder(R.drawable.progress_bar)
+                            .error(R.drawable.ic_baseline_network_error_cloud)
+                            .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                            .into(gifsImageView)
                     }
                 }
                 is GifsBrowserViewState.Error -> {
@@ -121,7 +123,7 @@ class GifsBrowserFragment : Fragment() {
                     errorImageView.setImageResource(viewState.drawableRes)
                     tryAgainButton.isVisible = viewState.isRetryAvailable
                 }
-                GifsBrowserViewState.Loading -> loadingProgressBar
+                GifsBrowserViewState.Loading -> Unit
             }
         }
     }

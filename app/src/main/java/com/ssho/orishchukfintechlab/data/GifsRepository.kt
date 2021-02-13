@@ -11,7 +11,7 @@ interface GifsRepository {
 
     fun getLastGif(): ResultWrapper<ImageData>
 
-    fun isPreviousGifCached(): Boolean
+    fun isPreviousGifAvailable(): Boolean
 
-    fun isNextGifCached(): Boolean
+    fun isNextGifAvailable(): Boolean
 }

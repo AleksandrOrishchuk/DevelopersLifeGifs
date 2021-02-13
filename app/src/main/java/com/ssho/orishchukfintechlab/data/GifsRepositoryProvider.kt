@@ -10,19 +10,19 @@ class GifsRepositoryProvider(
     private val gifsRandomRepository: GifsRepository,
     private val gifsTopRepository: GifsRepository,
     private val gifsLatestRepository: GifsRepository,
-    private val gifsSavedRepository: GifsRepositoryWDatabase
+    private val gifsLikedRepository: GifsRepositoryStoreable
 ) {
     fun getGifsRepository(@IdRes menuTab: Int): GifsRepository {
         return when (menuTab) {
             TAB_RANDOM -> gifsRandomRepository
             TAB_TOP -> gifsTopRepository
             TAB_LATEST -> gifsLatestRepository
-            TAB_LIKED -> gifsSavedRepository
+            TAB_LIKED -> gifsLikedRepository
             else -> gifsRandomRepository
         }
     }
 
-    fun getGifsSavedRepository(): GifsRepositoryWDatabase {
-        return gifsSavedRepository
+    fun getGifsSavedRepository(): GifsRepositoryStoreable {
+        return gifsLikedRepository
     }
 }

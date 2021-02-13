@@ -2,7 +2,9 @@ package com.ssho.orishchukfintechlab.data
 
 import com.ssho.orishchukfintechlab.data.model.ImageData
 
-class GifsSavedRepository(private val gifsSavedLocalDataSource: GifsLocalDataSourceWDatabase) : GifsRepositoryWDatabase {
+class GifsLikedRepository(
+    private val gifsSavedLocalDataSource: GifsLocalDataSourceWDatabase
+) : GifsRepositoryStoreable {
     override suspend fun getNextGif(): ResultWrapper<ImageData> {
         return gifsSavedLocalDataSource.getNextGif()
     }
@@ -12,30 +14,34 @@ class GifsSavedRepository(private val gifsSavedLocalDataSource: GifsLocalDataSou
     }
 
     override suspend fun getCurrentGif(): ResultWrapper<ImageData> {
-        return gifsSavedLocalDataSource.getCurrentGifFromDatabase()
+        return gifsSavedLocalDataSource.getCurrentGif()
     }
 
     override fun getLastGif(): ResultWrapper<ImageData> {
         return gifsSavedLocalDataSource.getLastGif()
     }
 
-    override fun isPreviousGifCached(): Boolean {
+    override fun isPreviousGifAvailable(): Boolean {
         return gifsSavedLocalDataSource.isPreviousGifCached()
     }
 
-    override fun isNextGifCached(): Boolean {
+    override fun isNextGifAvailable(): Boolean {
         return gifsSavedLocalDataSource.isNextGifCached()
     }
 
-    override suspend fun saveGifToDatabase(imageData: ImageData) {
+    override suspend fun getSavedGifs(): List<ImageData> {
+        return gifsSavedLocalDataSource.getGifsFromDatabase()
+    }
+
+    override suspend fun saveGif(imageData: ImageData) {
         gifsSavedLocalDataSource.saveGifToDatabase(imageData)
     }
 
-    override suspend fun deleteGifFromDatabase(imageData: ImageData) {
+    override suspend fun deleteGif(imageData: ImageData) {
         gifsSavedLocalDataSource.deleteGifFromDatabase(imageData)
     }
 
-    override suspend fun isGifLiked(imageData: ImageData): Boolean {
+    override suspend fun isGifSaved(imageData: ImageData): Boolean {
         return gifsSavedLocalDataSource.isGifSavedToDatabase(imageData)
     }
 }

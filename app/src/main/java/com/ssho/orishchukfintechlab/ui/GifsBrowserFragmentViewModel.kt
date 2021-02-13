@@ -8,7 +8,6 @@ import com.ssho.orishchukfintechlab.data.GifsRepositoryProvider
 import com.ssho.orishchukfintechlab.data.ResultWrapper
 import com.ssho.orishchukfintechlab.data.model.ImageData
 import com.ssho.orishchukfintechlab.R
-import com.ssho.orishchukfintechlab.data.GifsRepositoryWDatabase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -25,10 +24,10 @@ class GifsBrowserFragmentViewModel(
         MutableLiveData(GifsBrowserViewState.Loading)
     private var _currentMenuTab = initialMenuTab
 
-    private var gifsRepository = gifsRepositoryProvider.getGifsRepository(initialMenuTab)
+    private val gifsRepository get() = gifsRepositoryProvider.getGifsRepository(currentMenuTab)
 
     init {
-        onLoadNextGIFClick()
+        loadCurrentGIF()
     }
 
     fun onLoadNextGIFClick() {
@@ -49,26 +48,13 @@ class GifsBrowserFragmentViewModel(
         }
     }
 
-
-    fun onMenuTabSelected(newMenuTab: Int): Boolean {
-        if (newMenuTab == currentMenuTab)
-            return false
-
-        updateGifsRepository(newMenuTab)
-        loadCurrentGIF()
-
-        _currentMenuTab = newMenuTab
-
-        return true
-    }
-
     fun onLikeCurrentGIFClick() {
         viewModelScope.launch(dispatcher) {
             val imageDataResponse = gifsRepository.getCurrentGif()
             if (imageDataResponse is ResultWrapper.Success)
                 gifsRepositoryProvider
                     .getGifsSavedRepository()
-                    .saveGifToDatabase(imageData = imageDataResponse.value)
+                    .saveGif(imageData = imageDataResponse.value)
         }
     }
 
@@ -78,14 +64,20 @@ class GifsBrowserFragmentViewModel(
             if (imageDataResponse is ResultWrapper.Success)
                 gifsRepositoryProvider
                     .getGifsSavedRepository()
-                    .deleteGifFromDatabase(imageDataResponse.value)
+                    .deleteGif(imageDataResponse.value)
             if (currentMenuTab == TAB_LIKED)
                 loadCurrentGIF()
         }
     }
 
-    private fun updateGifsRepository(newMenuTab: Int) {
-        gifsRepository = gifsRepositoryProvider.getGifsRepository(newMenuTab)
+    fun onMenuTabSelected(newMenuTab: Int): Boolean {
+        if (newMenuTab == currentMenuTab)
+            return false
+
+        _currentMenuTab = newMenuTab
+        loadCurrentGIF()
+
+        return true
     }
 
     private fun loadCurrentGIF() {
@@ -103,15 +95,11 @@ class GifsBrowserFragmentViewModel(
                 _viewState.postValue(
                     GifsBrowserViewState.Result(
                         gifImageData = result.value,
-                        isPreviousButtonEnabled = gifsRepository.isPreviousGifCached(),
-                        isNextButtonEnabled =
-                        if (gifsRepository is GifsRepositoryWDatabase)
-                            gifsRepository.isNextGifCached()
-                        else
-                            true,
+                        isPreviousButtonEnabled = gifsRepository.isPreviousGifAvailable(),
+                        isNextButtonEnabled = gifsRepository.isNextGifAvailable(),
                         isCurrentGifLiked = gifsRepositoryProvider
                             .getGifsSavedRepository()
-                            .isGifLiked(result.value)
+                            .isGifSaved(result.value)
                     )
                 )
             is ResultWrapper.NetworkError ->
@@ -164,7 +152,7 @@ sealed class GifsBrowserViewState {
     data class Result(
         val gifImageData: ImageData = ImageData(),
         val isPreviousButtonEnabled: Boolean = false,
-        val isNextButtonEnabled: Boolean = true,
+        val isNextButtonEnabled: Boolean = false,
         val isCurrentGifLiked: Boolean = false
     ) : GifsBrowserViewState()
 

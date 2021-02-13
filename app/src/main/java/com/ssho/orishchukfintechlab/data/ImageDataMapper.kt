@@ -12,6 +12,8 @@ class ImageDataMapper {
     }
 
     fun map(imageDataEntities: List<ImageDataEntity>): List<ImageData> {
+        if (imageDataEntities.isEmpty())
+            return emptyList()
         return imageDataEntities.map {
             ImageData(description = it.imageDescription, gifURL = it.imageUrl)
         }

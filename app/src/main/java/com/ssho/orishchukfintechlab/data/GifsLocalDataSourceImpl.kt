@@ -1,55 +1,42 @@
 package com.ssho.orishchukfintechlab.data
 
-import com.ssho.orishchukfintechlab.data.model.ImageDataCache
+import com.ssho.orishchukfintechlab.data.cache.ImageDataCache
 import com.ssho.orishchukfintechlab.data.model.ImageData
 
-open class GifsLocalDataSourceImpl : GifsLocalDataSource {
-    internal val gifsCache = ImageDataCache()
-    private val cachedGifsCount: Int get() = gifsCache.cachedImages.size
+open class GifsLocalDataSourceImpl(
+    internal val gifsCache: ImageDataCache,
+    private val dataRequestHandler: DataRequestHandler
+) : GifsLocalDataSource {
 
     override fun getPreviousGif(): ResultWrapper<ImageData> {
-        if (!isPreviousGifCached())
-            return ResultWrapper.GenericError
-
-        val position = --gifsCache.currentPosition
-        val imageData = gifsCache.cachedImages[position]
-
-        return ResultWrapper.Success(imageData)
+        return dataRequestHandler.handleDomainDataRequest {
+            gifsCache.getPreviousImage()
+        }
     }
 
     override fun getNextGif(): ResultWrapper<ImageData> {
-        if (!isNextGifCached())
-            return ResultWrapper.NoDataError
-
-        val position = ++gifsCache.currentPosition
-        val imageData = gifsCache.cachedImages[position]
-
-        return ResultWrapper.Success(imageData)
+        return dataRequestHandler.handleDomainDataRequest {
+            gifsCache.getNextImage()
+        }
     }
 
-    override fun getCurrentGif(): ResultWrapper<ImageData> {
-        if (gifsCache.currentPosition < 0)
-            return ResultWrapper.GenericError
+    override suspend fun getCurrentGif(): ResultWrapper<ImageData> {
+        return dataRequestHandler.handleDomainDataRequest {
+            gifsCache.getCurrentImage()
+        }
+    }
 
-        val imageData = gifsCache.cachedImages[gifsCache.currentPosition]
-
-        return ResultWrapper.Success(imageData)
+    override fun getLastGif(): ResultWrapper<ImageData> {
+        return dataRequestHandler.handleDomainDataRequest {
+            gifsCache.getLastCachedImage()
+        }
     }
 
     override fun cacheImageData(imageData: ImageData) {
-        gifsCache.cachedImages.add(imageData)
+        gifsCache.cacheImage(imageData)
     }
 
-    override fun isPreviousGifCached(): Boolean = gifsCache.currentPosition > 0
+    override fun isPreviousGifCached(): Boolean = gifsCache.isPreviousImageCached()
 
-    override fun isNextGifCached(): Boolean = gifsCache.currentPosition < cachedGifsCount - 1
-
-    override fun getLastGif(): ResultWrapper<ImageData> {
-        if (cachedGifsCount == 0)
-            return ResultWrapper.GenericError
-
-        gifsCache.currentPosition = cachedGifsCount - 1
-
-        return getCurrentGif()
-    }
+    override fun isNextGifCached(): Boolean = gifsCache.isNextImageCached()
 }

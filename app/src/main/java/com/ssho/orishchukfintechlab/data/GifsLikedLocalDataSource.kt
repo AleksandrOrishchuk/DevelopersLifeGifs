@@ -1,18 +1,17 @@
 package com.ssho.orishchukfintechlab.data
 
+import com.ssho.orishchukfintechlab.data.cache.ImageDataCache
 import com.ssho.orishchukfintechlab.data.database.SavedGifsDao
 import com.ssho.orishchukfintechlab.data.model.ImageData
 
-class GifsSavedLocalDataSource(
+class GifsLikedLocalDataSource(
+    gifsCache: ImageDataCache,
+    dataRequestHandler: DataRequestHandler,
     private val savedGifsDao: SavedGifsDao,
     private val imageDataMapper: ImageDataMapper
-) : GifsLocalDataSourceImpl(), GifsLocalDataSourceWDatabase {
-    override suspend fun getCurrentGifFromDatabase(): ResultWrapper<ImageData> {
-        val isLocalCacheEmpty = super.gifsCache.cachedImages.isEmpty()
-        if (isLocalCacheEmpty) {
-            loadDatabaseGifsToCache()
-            return super.getNextGif()
-        }
+) : GifsLocalDataSourceImpl(gifsCache, dataRequestHandler), GifsLocalDataSourceWDatabase {
+    override suspend fun getCurrentGif(): ResultWrapper<ImageData> {
+        loadSavedGifsToCache()
 
         return super.getCurrentGif()
     }
@@ -20,28 +19,28 @@ class GifsSavedLocalDataSource(
     override suspend fun saveGifToDatabase(imageData: ImageData) {
         val imageDataEntity = imageDataMapper.map(imageData)
         savedGifsDao.saveGif(imageDataEntity)
-        super.cacheImageData(imageData)
-        if (super.gifsCache.currentPosition < 0)
-            super.gifsCache.currentPosition++
     }
 
     override suspend fun deleteGifFromDatabase(imageData: ImageData) {
         val imageDataEntity = imageDataMapper.map(imageData)
         savedGifsDao.deleteGif(imageDataEntity)
-        loadDatabaseGifsToCache()
-        if (!super.isNextGifCached())
-            super.gifsCache.currentPosition--
+        loadSavedGifsToCache()
     }
 
-    private suspend fun loadDatabaseGifsToCache() {
+    override suspend fun getGifsFromDatabase(): List<ImageData> {
         val imageDataEntities = savedGifsDao.getSavedGifs()
-        val savedGifs = imageDataMapper.map(imageDataEntities)
-        super.gifsCache.cachedImages = savedGifs as MutableList<ImageData>
+
+        return imageDataMapper.map(imageDataEntities)
     }
 
     override suspend fun isGifSavedToDatabase(imageData: ImageData): Boolean {
         val imageDataEntity = imageDataMapper.map(imageData)
 
         return savedGifsDao.isGifSaved(imageDataEntity.imageUrl)
+    }
+
+    private suspend fun loadSavedGifsToCache() {
+        val savedGifs = getGifsFromDatabase()
+        super.gifsCache.updateCachedImages(savedGifs)
     }
 }

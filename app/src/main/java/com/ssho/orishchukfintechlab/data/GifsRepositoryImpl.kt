@@ -23,7 +23,7 @@ class GifsRepositoryImpl(
     }
 
     override fun getPreviousGif(): ResultWrapper<ImageData> {
-        if (isPreviousGifCached())
+        if (isPreviousGifAvailable())
             return getPreviousGifFromLocal()
 
         return ResultWrapper.GenericError
@@ -37,9 +37,9 @@ class GifsRepositoryImpl(
         return getNextGif()
     }
 
-    override fun isPreviousGifCached(): Boolean = gifsLocalDataSource.isPreviousGifCached()
+    override fun isPreviousGifAvailable(): Boolean = gifsLocalDataSource.isPreviousGifCached()
 
-    override fun isNextGifCached(): Boolean = gifsLocalDataSource.isNextGifCached()
+    override fun isNextGifAvailable(): Boolean = true
 
     override fun getLastGif(): ResultWrapper<ImageData> {
         return gifsLocalDataSource.getLastGif()
