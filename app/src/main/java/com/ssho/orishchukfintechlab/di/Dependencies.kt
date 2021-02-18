@@ -9,7 +9,8 @@ import com.ssho.orishchukfintechlab.data.ImageDataMapper
 import com.ssho.orishchukfintechlab.data.cache.ImageDataCache
 import com.ssho.orishchukfintechlab.data.database.DatabaseRequestHandler
 import com.ssho.orishchukfintechlab.data.database.SavedGifsDatabase
-import com.ssho.orishchukfintechlab.domain.*
+import com.ssho.orishchukfintechlab.domain.GifsBrowserDomainDataMapper
+import com.ssho.orishchukfintechlab.domain.usecase.*
 import com.ssho.orishchukfintechlab.ui.GifBrowserUiMapper
 import com.ssho.orishchukfintechlab.ui.GifsBrowserFragmentViewModelFactory
 import kotlinx.coroutines.Dispatchers
@@ -39,24 +40,31 @@ private val databaseRequestHandler: DatabaseRequestHandler by lazy {
     DatabaseRequestHandler()
 }
 
+private val imageDataMapper: ImageDataMapper by lazy {
+    ImageDataMapper()
+}
+
 private val gifsRandomRemoteDataSource: GifsRemoteDataSource by lazy {
     GifsRandomRemoteDataSource(
         developersLifeApi = developersLifeApi,
-        apiRequestHandler = apiRequestHandler
+        apiRequestHandler = apiRequestHandler,
+        imageDataMapper = imageDataMapper
     )
 }
 
 private val gifsTopRemoteDataSource: GifsRemoteDataSource by lazy {
     GifsTopRemoteDataSource(
         developersLifeApi = developersLifeApi,
-        apiRequestHandler = apiRequestHandler
+        apiRequestHandler = apiRequestHandler,
+        imageDataMapper = imageDataMapper
     )
 }
 
 private val gifsLatestRemoteDataSource: GifsRemoteDataSource by lazy {
     GifsLatestRemoteDataSource(
         developersLifeApi = developersLifeApi,
-        apiRequestHandler = apiRequestHandler
+        apiRequestHandler = apiRequestHandler,
+        imageDataMapper = imageDataMapper
     )
 }
 
@@ -91,7 +99,7 @@ private val gifLikedRepository: GifsRepositoryStoreable by lazy {
             databaseRequestHandler = databaseRequestHandler,
             dispatcher = Dispatchers.IO,
             savedGifsDao = savedGifsDao,
-            imageDataMapper = ImageDataMapper()
+            imageDataMapper = imageDataMapper
         )
     )
 }
@@ -105,16 +113,29 @@ private val gifsRepositoryProvider: GifsRepositoryProvider by lazy {
     )
 }
 
+private val gifsBrowserDomainDataMapper: GifsBrowserDomainDataMapper by lazy {
+    GifsBrowserDomainDataMapper()
+}
+
 private val getNextGifUseCase: GetNextGifUseCase by lazy {
-    GetNextGifUseCaseImpl(gifsRepositoryProvider)
+    GetNextGifUseCaseImpl(
+        gifsRepositoryProvider,
+        gifsBrowserDomainDataMapper
+    )
 }
 
 private val getPreviousGifUseCase: GetPreviousGifUseCase by lazy {
-    GetPreviousGifUseCaseImpl(gifsRepositoryProvider)
+    GetPreviousGifUseCaseImpl(
+        gifsRepositoryProvider,
+        gifsBrowserDomainDataMapper
+    )
 }
 
 private val getCurrentGifUseCase: GetCurrentGifUseCase by lazy {
-    GetCurrentGifUseCaseImpl(gifsRepositoryProvider)
+    GetCurrentGifUseCaseImpl(
+        gifsRepositoryProvider,
+        gifsBrowserDomainDataMapper
+    )
 }
 
 private val likeGifUseCase: LikeGifUseCase by lazy {

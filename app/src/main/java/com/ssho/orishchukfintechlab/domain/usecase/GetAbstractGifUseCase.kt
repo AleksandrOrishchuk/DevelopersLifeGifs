@@ -1,29 +1,32 @@
-package com.ssho.orishchukfintechlab.domain
+package com.ssho.orishchukfintechlab.domain.usecase
 
+import com.ssho.orishchukfintechlab.data.GifsRepository
 import com.ssho.orishchukfintechlab.data.GifsRepositoryProvider
 import com.ssho.orishchukfintechlab.data.ResultWrapper
+import com.ssho.orishchukfintechlab.data.model.ImageData
+import com.ssho.orishchukfintechlab.domain.GifsBrowserDomainDataMapper
 import com.ssho.orishchukfintechlab.domain.model.GifsBrowserDomainData
 
-interface GetNextGifUseCase {
-    suspend operator fun invoke(menuId: Int): ResultWrapper<GifsBrowserDomainData>
-}
-
-class GetNextGifUseCaseImpl(
-    private val gifsRepositoryProvider: GifsRepositoryProvider
-) : GetNextGifUseCase {
+abstract class GetAbstractGifUseCase(
+    private val gifsRepositoryProvider: GifsRepositoryProvider,
+    private val gifsBrowserDomainDataMapper: GifsBrowserDomainDataMapper
+) : GetCurrentGifUseCase,
+    GetNextGifUseCase,
+    GetPreviousGifUseCase {
     override suspend fun invoke(menuId: Int): ResultWrapper<GifsBrowserDomainData> {
         val gifsRepository = gifsRepositoryProvider.getGifsRepository(menuId)
 
-        return when (val imageDataResponse = gifsRepository.getNextGif()) {
+        return when (val imageDataResponse = getImageDataResponse(gifsRepository)) {
             is ResultWrapper.Success -> {
+                val gifsImageData = imageDataResponse.value
+                val gifsBrowserDomainData = gifsImageData.let(gifsBrowserDomainDataMapper)
                 val isCurrentGifLiked =
                     gifsRepositoryProvider
                         .getGifsSavedRepository()
-                        .isGifSaved(imageDataResponse.value)
+                        .isGifSaved(gifsImageData)
+
                 ResultWrapper.Success(
-                    GifsBrowserDomainData(
-                        currentGifUrl = imageDataResponse.value.gifURL,
-                        currentGifDescription = imageDataResponse.value.description,
+                    gifsBrowserDomainData.copy(
                         isNextGifAvailable = gifsRepository.isNextGifAvailable(),
                         isPreviousGifAvailable = gifsRepository.isPreviousGifAvailable(),
                         isCurrentGifLiked = isCurrentGifLiked
@@ -35,5 +38,9 @@ class GetNextGifUseCaseImpl(
             ResultWrapper.NoDataError -> ResultWrapper.NoDataError
         }
     }
-}
 
+    internal abstract suspend fun getImageDataResponse(
+        gifsRepository: GifsRepository
+    ): ResultWrapper<ImageData>
+
+}

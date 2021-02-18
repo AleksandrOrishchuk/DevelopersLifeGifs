@@ -6,8 +6,8 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.*
 import com.ssho.orishchukfintechlab.data.ResultWrapper
 import com.ssho.orishchukfintechlab.R
-import com.ssho.orishchukfintechlab.domain.*
 import com.ssho.orishchukfintechlab.domain.model.GifsBrowserDomainData
+import com.ssho.orishchukfintechlab.domain.usecase.*
 import kotlinx.coroutines.launch
 
 class GifsBrowserFragmentViewModel(

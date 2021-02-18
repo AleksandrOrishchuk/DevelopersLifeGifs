@@ -1,20 +1,21 @@
-package com.ssho.orishchukfintechlab.domain
+package com.ssho.orishchukfintechlab.domain.usecase
 
 import com.ssho.orishchukfintechlab.data.GifsRepositoryProvider
 import com.ssho.orishchukfintechlab.data.ResultWrapper
 
-interface LikeGifUseCase {
-    suspend operator fun invoke(menuId:Int)
+interface DislikeGifUseCase {
+    suspend operator fun invoke(menuId: Int)
 }
 
-class LikeGifUseCaseImpl(
+class DislikeGifUseCaseImpl(
     private val gifsRepositoryProvider: GifsRepositoryProvider
-) : LikeGifUseCase {
+) : DislikeGifUseCase {
     override suspend fun invoke(menuId: Int) {
-        val imageDataResponse = gifsRepositoryProvider.getGifsRepository(menuId).getCurrentGif()
+        val gifsRepository = gifsRepositoryProvider.getGifsRepository(menuId)
+        val imageDataResponse = gifsRepository.getCurrentGif()
         if (imageDataResponse is ResultWrapper.Success)
             gifsRepositoryProvider
                 .getGifsSavedRepository()
-                .saveGif(imageData = imageDataResponse.value)
+                .deleteGif(imageDataResponse.value)
     }
 }
