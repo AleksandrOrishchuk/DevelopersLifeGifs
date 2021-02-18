@@ -14,12 +14,6 @@ interface DevelopersLifeApi {
         page: String
     ): ImageApiListDTO
 
-    @GET("hot/{page}?json=true")
-    suspend fun fetchHotImageData(
-        @Path(value = "page", encoded = true)
-        page: String
-    ): ImageApiListDTO
-
     @GET("latest/{page}?json=true")
     suspend fun fetchLatestImageData(
         @Path(value = "page", encoded = true)

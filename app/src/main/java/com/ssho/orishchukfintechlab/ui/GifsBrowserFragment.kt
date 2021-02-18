@@ -67,7 +67,7 @@ class GifsBrowserFragment : Fragment() {
                 viewModel.onMenuTabSelected(it.itemId)
             }
 
-            navigationBar.selectedItemId = viewModel.currentMenuTab
+            navigationBar.selectedItemId = viewModel.currentMenuTabId
 
             likedCheckbox.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked)
@@ -96,22 +96,21 @@ class GifsBrowserFragment : Fragment() {
             errorUIContainer.isVisible = viewState is GifsBrowserViewState.Error
             loadingProgressBar.isVisible = viewState is GifsBrowserViewState.Loading
 
-
             when (viewState) {
                 is GifsBrowserViewState.Result -> {
-                    previousButton.isEnabled = viewState.isPreviousButtonEnabled
-                    previousButton.isClickable = viewState.isPreviousButtonEnabled
-                    nextButton.isEnabled = viewState.isNextButtonEnabled
-                    nextButton.isClickable = viewState.isNextButtonEnabled
-                    likedCheckbox.isChecked = viewState.isCurrentGifLiked
+                    with(viewState.gifsBrowserUi) {
+                        previousButton.isEnabled = isPreviousButtonEnabled
+                        previousButton.isClickable = isPreviousButtonEnabled
+                        nextButton.isEnabled = isNextButtonEnabled
+                        nextButton.isClickable = isNextButtonEnabled
+                        likedCheckbox.isChecked = isCurrentGifLiked
 
-                    gifsTitle.text = viewState.gifImageData.description
+                        gifsTitle.text = currentGifsDescription
 
-                    viewState.gifImageData.gifURL.also {
-                        Log.d(TAG, "Current GIF url: $it")
+                        Log.d(TAG, "Current GIF url: ${currentGifsUrl}")
 
                         Glide.with(requireContext())
-                            .load(it)
+                            .load(currentGifsUrl)
                             .placeholder(R.drawable.progress_bar)
                             .error(R.drawable.ic_baseline_network_error_cloud)
                             .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)

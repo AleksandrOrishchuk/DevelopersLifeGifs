@@ -7,8 +7,12 @@ import com.ssho.orishchukfintechlab.data.api.ApiRequestHandler
 import com.ssho.orishchukfintechlab.data.api.DevelopersLifeApi
 import com.ssho.orishchukfintechlab.data.ImageDataMapper
 import com.ssho.orishchukfintechlab.data.cache.ImageDataCache
+import com.ssho.orishchukfintechlab.data.database.DatabaseRequestHandler
 import com.ssho.orishchukfintechlab.data.database.SavedGifsDatabase
+import com.ssho.orishchukfintechlab.domain.*
+import com.ssho.orishchukfintechlab.ui.GifBrowserUiMapper
 import com.ssho.orishchukfintechlab.ui.GifsBrowserFragmentViewModelFactory
+import kotlinx.coroutines.Dispatchers
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -29,6 +33,10 @@ private val apiRequestHandler: ApiRequestHandler by lazy {
 
 private val dataRequestHandler: DataRequestHandler by lazy {
     DataRequestHandler()
+}
+
+private val databaseRequestHandler: DatabaseRequestHandler by lazy {
+    DatabaseRequestHandler()
 }
 
 private val gifsRandomRemoteDataSource: GifsRemoteDataSource by lazy {
@@ -80,6 +88,8 @@ private val gifLikedRepository: GifsRepositoryStoreable by lazy {
         GifsLikedLocalDataSource(
             gifsCache = ImageDataCache(),
             dataRequestHandler = dataRequestHandler,
+            databaseRequestHandler = databaseRequestHandler,
+            dispatcher = Dispatchers.IO,
             savedGifsDao = savedGifsDao,
             imageDataMapper = ImageDataMapper()
         )
@@ -95,8 +105,33 @@ private val gifsRepositoryProvider: GifsRepositoryProvider by lazy {
     )
 }
 
+private val getNextGifUseCase: GetNextGifUseCase by lazy {
+    GetNextGifUseCaseImpl(gifsRepositoryProvider)
+}
+
+private val getPreviousGifUseCase: GetPreviousGifUseCase by lazy {
+    GetPreviousGifUseCaseImpl(gifsRepositoryProvider)
+}
+
+private val getCurrentGifUseCase: GetCurrentGifUseCase by lazy {
+    GetCurrentGifUseCaseImpl(gifsRepositoryProvider)
+}
+
+private val likeGifUseCase: LikeGifUseCase by lazy {
+    LikeGifUseCaseImpl(gifsRepositoryProvider)
+}
+
+private val dislikeGifUseCase: DislikeGifUseCase by lazy {
+    DislikeGifUseCaseImpl(gifsRepositoryProvider)
+}
+
 internal fun provideGifsBrowserViewModelFactory(): GifsBrowserFragmentViewModelFactory {
     return GifsBrowserFragmentViewModelFactory(
-        gifsRepositoryProvider = gifsRepositoryProvider
+        getCurrentGifUseCase = getCurrentGifUseCase,
+        getNextGifUseCase = getNextGifUseCase,
+        getPreviousGifUseCase = getPreviousGifUseCase,
+        likeGifUseCase = likeGifUseCase,
+        dislikeGifUseCase = dislikeGifUseCase,
+        gifsBrowserUiMapper = GifBrowserUiMapper()
     )
 }

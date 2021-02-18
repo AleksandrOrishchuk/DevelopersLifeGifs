@@ -11,7 +11,7 @@ class ApiRequestHandler {
     suspend fun <T> handleApiRequest(dispatcher: CoroutineDispatcher, action: suspend() -> T): ResultWrapper<T> {
         return withContext(dispatcher) {
             try {
-                ResultWrapper.Success(action.invoke()).also {
+                ResultWrapper.Success(action()).also {
                     Log.d(TAG, "Successful Api response")
                 }
             } catch (throwable: Throwable) {
