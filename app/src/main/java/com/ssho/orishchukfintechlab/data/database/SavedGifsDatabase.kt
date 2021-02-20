@@ -14,7 +14,7 @@ abstract class SavedGifsDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: SavedGifsDatabase? = null
 
-        fun getExchangeRatesDatabase(context: Context): SavedGifsDatabase {
+        fun getSavedGifsDatabase(context: Context): SavedGifsDatabase {
             return INSTANCE ?: synchronized(this) {
                 val database = Room.databaseBuilder(
                     context,

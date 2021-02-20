@@ -90,7 +90,7 @@ private val gifsLatestRepository: GifsRepository by lazy {
 }
 
 private val gifLikedRepository: GifsRepositoryStoreable by lazy {
-    val savedGifsDatabase = SavedGifsDatabase.getExchangeRatesDatabase(androidContext)
+    val savedGifsDatabase = SavedGifsDatabase.getSavedGifsDatabase(androidContext)
     val savedGifsDao = savedGifsDatabase.savedGifsDao()
     GifsLikedRepository(
         GifsLikedLocalDataSource(
