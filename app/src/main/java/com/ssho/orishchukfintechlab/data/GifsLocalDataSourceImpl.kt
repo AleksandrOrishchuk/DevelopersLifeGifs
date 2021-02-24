@@ -5,31 +5,22 @@ import com.ssho.orishchukfintechlab.data.model.ImageData
 
 open class GifsLocalDataSourceImpl(
     internal val gifsCache: ImageDataCache,
-    private val dataRequestHandler: DataRequestHandler
 ) : GifsLocalDataSource {
 
-    override fun getPreviousGif(): ResultWrapper<ImageData> {
-        return dataRequestHandler.handleDomainDataRequest {
-            gifsCache.getPreviousImage()
-        }
+    override fun getPreviousGif(): ImageData {
+        return gifsCache.getPreviousImage()
     }
 
-    override fun getNextGif(): ResultWrapper<ImageData> {
-        return dataRequestHandler.handleDomainDataRequest {
-            gifsCache.getNextImage()
-        }
+    override fun getNextGif(): ImageData {
+        return gifsCache.getNextImage()
     }
 
-    override suspend fun getCurrentGif(): ResultWrapper<ImageData> {
-        return dataRequestHandler.handleDomainDataRequest {
-            gifsCache.getCurrentImage()
-        }
+    override suspend fun getCurrentGif(): ImageData {
+        return gifsCache.getCurrentImage()
     }
 
-    override fun getLastGif(): ResultWrapper<ImageData> {
-        return dataRequestHandler.handleDomainDataRequest {
-            gifsCache.getLastCachedImage()
-        }
+    override fun getLastGif(): ImageData {
+        return gifsCache.getLastCachedImage()
     }
 
     override fun cacheImageData(imageData: ImageData) {

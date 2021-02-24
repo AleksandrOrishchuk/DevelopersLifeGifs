@@ -1,7 +1,6 @@
 package com.ssho.orishchukfintechlab.domain.usecase
 
 import com.ssho.orishchukfintechlab.data.GifsRepositoryProvider
-import com.ssho.orishchukfintechlab.data.ResultWrapper
 
 interface DislikeGifUseCase {
     suspend operator fun invoke(menuId: Int)
@@ -12,10 +11,10 @@ class DislikeGifUseCaseImpl(
 ) : DislikeGifUseCase {
     override suspend fun invoke(menuId: Int) {
         val gifsRepository = gifsRepositoryProvider.getGifsRepository(menuId)
-        val imageDataResponse = gifsRepository.getCurrentGif()
-        if (imageDataResponse is ResultWrapper.Success)
-            gifsRepositoryProvider
-                .getGifsSavedRepository()
-                .deleteGif(imageDataResponse.value)
+        val imageData = gifsRepository.getCurrentGif()
+
+        gifsRepositoryProvider
+            .getGifsSavedRepository()
+            .deleteGif(imageData)
     }
 }

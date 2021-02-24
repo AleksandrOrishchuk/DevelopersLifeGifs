@@ -4,11 +4,12 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.IdRes
 import androidx.annotation.StringRes
 import androidx.lifecycle.*
-import com.ssho.orishchukfintechlab.data.ResultWrapper
 import com.ssho.orishchukfintechlab.R
 import com.ssho.orishchukfintechlab.domain.model.GifsBrowserDomainData
 import com.ssho.orishchukfintechlab.domain.usecase.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class GifsBrowserFragmentViewModel(
     private val getCurrentGifUseCase: GetCurrentGifUseCase,
@@ -32,17 +33,31 @@ class GifsBrowserFragmentViewModel(
 
     fun onLoadNextGIFClick() {
         viewModelScope.launch {
-            postLoadingViewState()
-            val nextGifResult = getNextGifUseCase(currentMenuTabId)
-            unwrapResultAndPostUIViewState(nextGifResult)
+            setLoadingViewState()
+            runCatching {
+                withContext(Dispatchers.IO) {
+                    getNextGifUseCase(currentMenuTabId)
+                }
+            }.onSuccess {
+                setResultViewState(it)
+            }.onFailure {
+                setNetworkErrorViewState()
+            }
         }
     }
 
     fun onLoadPreviousGIFClick() {
         viewModelScope.launch {
-            postLoadingViewState()
-            val previousGifResult = getPreviousGifUseCase(currentMenuTabId)
-            unwrapResultAndPostUIViewState(previousGifResult)
+            setLoadingViewState()
+            runCatching {
+                withContext(Dispatchers.IO) {
+                    getPreviousGifUseCase(currentMenuTabId)
+                }
+            }.onSuccess {
+                setResultViewState(it)
+            }.onFailure {
+                setGenericErrorViewState()
+            }
         }
     }
 
@@ -72,63 +87,56 @@ class GifsBrowserFragmentViewModel(
 
     private fun loadCurrentGIF() {
         viewModelScope.launch {
-            postLoadingViewState()
-            val currentGifResult = getCurrentGifUseCase(currentMenuTabId)
-            unwrapResultAndPostUIViewState(currentGifResult)
+            setLoadingViewState()
+            runCatching {
+                withContext(Dispatchers.IO) {
+                    getCurrentGifUseCase(currentMenuTabId)
+                }
+            }.onSuccess {
+                setResultViewState(it)
+            }.onFailure {
+                if (currentMenuTabId == TAB_LIKED)
+                    setNoLikedGifsViewState()
+                else
+                    onLoadNextGIFClick()
+            }
         }
     }
 
-    private fun unwrapResultAndPostUIViewState(result: ResultWrapper<GifsBrowserDomainData>) {
-        when (result) {
-            is ResultWrapper.Success -> postResultViewState(result.value)
-            is ResultWrapper.NetworkError -> postNetworkErrorViewState()
-            is ResultWrapper.GenericError -> postGenericErrorViewState()
-            is ResultWrapper.NoDataError -> postNoDataErrorViewState()
-
-        }
+    private fun setLoadingViewState() {
+        _viewState.value = GifsBrowserViewState.Loading
     }
 
-    private fun postLoadingViewState() {
-        _viewState.postValue(GifsBrowserViewState.Loading)
-    }
-
-    private fun postResultViewState(gifsBrowserDomainData: GifsBrowserDomainData) {
+    private fun setResultViewState(gifsBrowserDomainData: GifsBrowserDomainData) {
         val gifsBrowserUi = gifsBrowserDomainData.let(gifBrowserUiMapper)
-        _viewState.postValue(
-            GifsBrowserViewState.Result(
-                gifsBrowserUi
-            )
-        )
+        _viewState.value = GifsBrowserViewState.Result(gifsBrowserUi)
     }
 
-    private fun postNetworkErrorViewState() {
-        _viewState.postValue(
+    private fun setNetworkErrorViewState() {
+        _viewState.value =
             GifsBrowserViewState.Error(
                 message = R.string.network_error_text,
                 drawableRes = R.drawable.ic_baseline_network_error_cloud,
                 isRetryAvailable = true
             )
-        )
     }
 
-    private fun postGenericErrorViewState() {
-        _viewState.postValue(
+    private fun setGenericErrorViewState() {
+        _viewState.value =
             GifsBrowserViewState.Error(
                 message = R.string.generic_error_text,
                 drawableRes = R.drawable.ic_generic_error,
                 isRetryAvailable = true
             )
-        )
     }
 
-    private fun postNoDataErrorViewState() {
-        _viewState.postValue(
+    private fun setNoLikedGifsViewState() {
+        _viewState.value =
             GifsBrowserViewState.Error(
                 message = R.string.no_liked_posts_error_text,
                 drawableRes = R.drawable.ic_image_not_found,
                 isRetryAvailable = false
             )
-        )
     }
 
 }

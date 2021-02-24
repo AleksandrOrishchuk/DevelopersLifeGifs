@@ -5,9 +5,9 @@ import com.ssho.orishchukfintechlab.data.database.entities.ImageDataEntity
 import com.ssho.orishchukfintechlab.data.model.ImageData
 
 class ImageDataMapper(
-    val toEntity: MapImageDataToEntity = MapImageDataToEntity(),
-    val toDomain: MapImageDataFromEntity = MapImageDataFromEntity(),
-    val fromDTO: MapImageDataFromDTO = MapImageDataFromDTO()
+    val toEntity: (ImageData) -> ImageDataEntity,
+    val toDomain: (ImageDataEntity) -> ImageData,
+    val fromDTO: (ImageApiDTO) -> ImageData
 )
 
 class MapImageDataToEntity : (ImageData) -> ImageDataEntity {

@@ -5,19 +5,19 @@ import com.ssho.orishchukfintechlab.data.model.ImageData
 class GifsLikedRepository(
     private val gifsSavedLocalDataSource: GifsLocalDataSourceWDatabase
 ) : GifsRepositoryStoreable {
-    override suspend fun getNextGif(): ResultWrapper<ImageData> {
+    override suspend fun getNextGif(): ImageData {
         return gifsSavedLocalDataSource.getNextGif()
     }
 
-    override fun getPreviousGif(): ResultWrapper<ImageData> {
+    override fun getPreviousGif(): ImageData {
         return gifsSavedLocalDataSource.getPreviousGif()
     }
 
-    override suspend fun getCurrentGif(): ResultWrapper<ImageData> {
+    override suspend fun getCurrentGif(): ImageData {
         return gifsSavedLocalDataSource.getCurrentGif()
     }
 
-    override fun getLastGif(): ResultWrapper<ImageData> {
+    override fun getLastGif(): ImageData {
         return gifsSavedLocalDataSource.getLastGif()
     }
 

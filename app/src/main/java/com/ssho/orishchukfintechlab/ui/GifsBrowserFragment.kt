@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
@@ -37,9 +36,8 @@ class GifsBrowserFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        fragmentBinding = DataBindingUtil.inflate(
+        fragmentBinding = FragmentGifsBrowserBinding.inflate(
             inflater,
-            R.layout.fragment_gifs_browser,
             container,
             false
         )

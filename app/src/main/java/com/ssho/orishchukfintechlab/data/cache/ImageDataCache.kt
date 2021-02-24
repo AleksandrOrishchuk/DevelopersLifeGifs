@@ -2,6 +2,7 @@ package com.ssho.orishchukfintechlab.data.cache
 
 import android.util.Log
 import com.ssho.orishchukfintechlab.data.model.ImageData
+import java.lang.RuntimeException
 
 private const val TAG = "ImageDataCache"
 private const val INVALID = -1
@@ -13,20 +14,20 @@ class ImageDataCache(
     private val isEmpty get() = cachedImages.isEmpty()
 
     fun getCurrentImage(): ImageData {
-        if (isEmpty) throw IllegalStateException("No saved images.")
+        if (isEmpty) throw NoCachedImagesException("No saved images.")
 
         return cachedImages[currentIndex]
     }
 
     fun getNextImage(): ImageData {
         return cachedImages[currentIndex + 1].also {
-            currentIndex++
+            ++currentIndex
         }
     }
 
     fun getPreviousImage(): ImageData {
         return cachedImages[currentIndex - 1].also {
-            currentIndex--
+            --currentIndex
         }
     }
 
@@ -44,7 +45,7 @@ class ImageDataCache(
         if (images.isEmpty())
             currentIndex = INVALID
         if (currentIndex == INVALID && images.isNotEmpty())
-            currentIndex++
+            ++currentIndex
         if (currentIndex > images.size - 1)
             currentIndex = images.size - 1
 
@@ -57,3 +58,5 @@ class ImageDataCache(
     fun isNextImageCached(): Boolean = !isEmpty && currentIndex < cachedImages.size - 1
 
 }
+
+class NoCachedImagesException(override val message: String? = null) : RuntimeException()

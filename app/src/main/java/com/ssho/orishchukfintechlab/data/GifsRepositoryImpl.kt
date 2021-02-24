@@ -7,53 +7,44 @@ class GifsRepositoryImpl(
     private val gifsLocalDataSource: GifsLocalDataSource
 ) : GifsRepository {
 
-    override suspend fun getNextGif(): ResultWrapper<ImageData> {
-        val cachedResult = getNextGifFromLocal()
-        if (cachedResult is ResultWrapper.Success)
-            return cachedResult
-
-        val fetchedResult = getNextGifsFromRemote()
-        if (fetchedResult is ResultWrapper.Success) {
-            cacheGifListToLocal(fetchedResult.value)
-
+    override suspend fun getNextGif(): ImageData {
+        if (gifsLocalDataSource.isNextGifCached())
             return getNextGifFromLocal()
-        }
 
-        return ResultWrapper.NetworkError
+        val fetchedGifs = getNextGifsFromRemote()
+        cacheGifListToLocal(fetchedGifs)
+
+        return getNextGifFromLocal()
     }
 
-    override fun getPreviousGif(): ResultWrapper<ImageData> {
+    override fun getPreviousGif(): ImageData {
         if (isPreviousGifAvailable())
             return getPreviousGifFromLocal()
 
-        return ResultWrapper.GenericError
+        throw IllegalStateException("Previous Gif is not cached!")
     }
 
-    override suspend fun getCurrentGif(): ResultWrapper<ImageData> {
-        val currentResult = gifsLocalDataSource.getCurrentGif()
-        if (currentResult is ResultWrapper.Success)
-            return currentResult
-
-        return getNextGif()
+    override suspend fun getCurrentGif(): ImageData {
+        return gifsLocalDataSource.getCurrentGif()
     }
 
     override fun isPreviousGifAvailable(): Boolean = gifsLocalDataSource.isPreviousGifCached()
 
     override fun isNextGifAvailable(): Boolean = true
 
-    override fun getLastGif(): ResultWrapper<ImageData> {
+    override fun getLastGif(): ImageData {
         return gifsLocalDataSource.getLastGif()
     }
 
-    private suspend fun getNextGifsFromRemote(): ResultWrapper<List<ImageData>> {
+    private suspend fun getNextGifsFromRemote(): List<ImageData> {
         return gifsRemoteDataSource.fetchImageData()
     }
 
-    private fun getNextGifFromLocal(): ResultWrapper<ImageData> {
+    private fun getNextGifFromLocal(): ImageData {
         return gifsLocalDataSource.getNextGif()
     }
 
-    private fun getPreviousGifFromLocal(): ResultWrapper<ImageData> {
+    private fun getPreviousGifFromLocal(): ImageData {
         return gifsLocalDataSource.getPreviousGif()
     }
 

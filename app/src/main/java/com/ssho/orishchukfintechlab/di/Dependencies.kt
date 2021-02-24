@@ -3,17 +3,14 @@ package com.ssho.orishchukfintechlab.di
 import android.annotation.SuppressLint
 import android.content.Context
 import com.ssho.orishchukfintechlab.data.*
-import com.ssho.orishchukfintechlab.data.api.ApiRequestHandler
 import com.ssho.orishchukfintechlab.data.api.DevelopersLifeApi
 import com.ssho.orishchukfintechlab.data.ImageDataMapper
 import com.ssho.orishchukfintechlab.data.cache.ImageDataCache
-import com.ssho.orishchukfintechlab.data.database.DatabaseRequestHandler
 import com.ssho.orishchukfintechlab.data.database.SavedGifsDatabase
 import com.ssho.orishchukfintechlab.domain.GifsBrowserDomainDataMapper
 import com.ssho.orishchukfintechlab.domain.usecase.*
 import com.ssho.orishchukfintechlab.ui.GifBrowserUiMapper
 import com.ssho.orishchukfintechlab.ui.GifsBrowserFragmentViewModelFactory
-import kotlinx.coroutines.Dispatchers
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -28,26 +25,17 @@ private val developersLifeApi: DevelopersLifeApi by lazy {
     retrofit.create(DevelopersLifeApi::class.java)
 }
 
-private val apiRequestHandler: ApiRequestHandler by lazy {
-    ApiRequestHandler()
-}
-
-private val dataRequestHandler: DataRequestHandler by lazy {
-    DataRequestHandler()
-}
-
-private val databaseRequestHandler: DatabaseRequestHandler by lazy {
-    DatabaseRequestHandler()
-}
-
 private val imageDataMapper: ImageDataMapper by lazy {
-    ImageDataMapper()
+    ImageDataMapper(
+        toEntity = MapImageDataToEntity(),
+        toDomain = MapImageDataFromEntity(),
+        fromDTO = MapImageDataFromDTO()
+    )
 }
 
 private val gifsRandomRemoteDataSource: GifsRemoteDataSource by lazy {
     GifsRandomRemoteDataSource(
         developersLifeApi = developersLifeApi,
-        apiRequestHandler = apiRequestHandler,
         imageDataMapper = imageDataMapper
     )
 }
@@ -55,7 +43,6 @@ private val gifsRandomRemoteDataSource: GifsRemoteDataSource by lazy {
 private val gifsTopRemoteDataSource: GifsRemoteDataSource by lazy {
     GifsTopRemoteDataSource(
         developersLifeApi = developersLifeApi,
-        apiRequestHandler = apiRequestHandler,
         imageDataMapper = imageDataMapper
     )
 }
@@ -63,7 +50,6 @@ private val gifsTopRemoteDataSource: GifsRemoteDataSource by lazy {
 private val gifsLatestRemoteDataSource: GifsRemoteDataSource by lazy {
     GifsLatestRemoteDataSource(
         developersLifeApi = developersLifeApi,
-        apiRequestHandler = apiRequestHandler,
         imageDataMapper = imageDataMapper
     )
 }
@@ -71,33 +57,31 @@ private val gifsLatestRemoteDataSource: GifsRemoteDataSource by lazy {
 private val gifsRandomRepository: GifsRepository by lazy {
     GifsRepositoryImpl(
         gifsRemoteDataSource = gifsRandomRemoteDataSource,
-        gifsLocalDataSource = GifsLocalDataSourceImpl(ImageDataCache(), dataRequestHandler)
+        gifsLocalDataSource = GifsLocalDataSourceImpl(ImageDataCache())
     )
 }
 
 private val gifsTopRepository: GifsRepository by lazy {
     GifsRepositoryImpl(
         gifsRemoteDataSource = gifsTopRemoteDataSource,
-        gifsLocalDataSource = GifsLocalDataSourceImpl(ImageDataCache(), dataRequestHandler)
+        gifsLocalDataSource = GifsLocalDataSourceImpl(ImageDataCache())
     )
 }
 
 private val gifsLatestRepository: GifsRepository by lazy {
     GifsRepositoryImpl(
         gifsRemoteDataSource = gifsLatestRemoteDataSource,
-        gifsLocalDataSource = GifsLocalDataSourceImpl(ImageDataCache(), dataRequestHandler)
+        gifsLocalDataSource = GifsLocalDataSourceImpl(ImageDataCache())
     )
 }
 
 private val gifLikedRepository: GifsRepositoryStoreable by lazy {
     val savedGifsDatabase = SavedGifsDatabase.getSavedGifsDatabase(androidContext)
     val savedGifsDao = savedGifsDatabase.savedGifsDao()
+
     GifsLikedRepository(
         GifsLikedLocalDataSource(
             gifsCache = ImageDataCache(),
-            dataRequestHandler = dataRequestHandler,
-            databaseRequestHandler = databaseRequestHandler,
-            dispatcher = Dispatchers.IO,
             savedGifsDao = savedGifsDao,
             imageDataMapper = imageDataMapper
         )
