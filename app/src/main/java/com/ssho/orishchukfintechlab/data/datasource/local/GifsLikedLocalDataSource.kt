@@ -1,5 +1,6 @@
-package com.ssho.orishchukfintechlab.data
+package com.ssho.orishchukfintechlab.data.datasource.local
 
+import com.ssho.orishchukfintechlab.data.ImageDataMapper
 import com.ssho.orishchukfintechlab.data.cache.ImageDataCache
 import com.ssho.orishchukfintechlab.data.database.SavedGifsDao
 import com.ssho.orishchukfintechlab.data.model.ImageData

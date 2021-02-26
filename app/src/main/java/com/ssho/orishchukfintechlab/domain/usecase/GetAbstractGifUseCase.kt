@@ -1,6 +1,6 @@
 package com.ssho.orishchukfintechlab.domain.usecase
 
-import com.ssho.orishchukfintechlab.data.GifsRepository
+import com.ssho.orishchukfintechlab.data.repository.GifsRepository
 import com.ssho.orishchukfintechlab.data.GifsRepositoryProvider
 import com.ssho.orishchukfintechlab.data.model.ImageData
 import com.ssho.orishchukfintechlab.domain.GifsBrowserDomainDataMapper

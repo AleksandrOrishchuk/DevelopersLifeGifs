@@ -1,9 +1,10 @@
-package com.ssho.orishchukfintechlab.data
+package com.ssho.orishchukfintechlab.data.datasource.remote
 
+import com.ssho.orishchukfintechlab.data.ImageDataMapper
 import com.ssho.orishchukfintechlab.data.api.ImageApiDTO
 import com.ssho.orishchukfintechlab.data.model.ImageData
 
-abstract class GifsRemoteDataSourceImpl(
+abstract class GifsAbstractRemoteDataSource(
     private val imageDataMapper: ImageDataMapper
 ) : GifsRemoteDataSource {
     protected var fetchingPage: Int = 0

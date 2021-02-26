@@ -7,7 +7,15 @@ import com.ssho.orishchukfintechlab.data.api.DevelopersLifeApi
 import com.ssho.orishchukfintechlab.data.ImageDataMapper
 import com.ssho.orishchukfintechlab.data.cache.ImageDataCache
 import com.ssho.orishchukfintechlab.data.database.SavedGifsDatabase
+import com.ssho.orishchukfintechlab.data.datasource.local.GifsLikedLocalDataSource
+import com.ssho.orishchukfintechlab.data.datasource.local.GifsLocalDataSourceImpl
+import com.ssho.orishchukfintechlab.data.datasource.remote.GifsLatestRemoteDataSource
+import com.ssho.orishchukfintechlab.data.datasource.remote.GifsRandomRemoteDataSource
+import com.ssho.orishchukfintechlab.data.datasource.remote.GifsRemoteDataSource
+import com.ssho.orishchukfintechlab.data.datasource.remote.GifsTopRemoteDataSource
+import com.ssho.orishchukfintechlab.data.repository.*
 import com.ssho.orishchukfintechlab.domain.GifsBrowserDomainDataMapper
+import com.ssho.orishchukfintechlab.data.GifsRepositoryProvider
 import com.ssho.orishchukfintechlab.domain.usecase.*
 import com.ssho.orishchukfintechlab.ui.GifBrowserUiMapper
 import com.ssho.orishchukfintechlab.ui.GifsBrowserFragmentViewModelFactory

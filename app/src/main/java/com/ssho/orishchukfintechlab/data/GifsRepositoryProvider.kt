@@ -1,6 +1,8 @@
 package com.ssho.orishchukfintechlab.data
 
 import androidx.annotation.IdRes
+import com.ssho.orishchukfintechlab.data.repository.GifsRepository
+import com.ssho.orishchukfintechlab.data.repository.GifsRepositoryStoreable
 import com.ssho.orishchukfintechlab.ui.TAB_LATEST
 import com.ssho.orishchukfintechlab.ui.TAB_LIKED
 import com.ssho.orishchukfintechlab.ui.TAB_RANDOM

@@ -1,5 +1,6 @@
-package com.ssho.orishchukfintechlab.data
+package com.ssho.orishchukfintechlab.data.repository
 
+import com.ssho.orishchukfintechlab.data.datasource.local.GifsLocalDataSourceWDatabase
 import com.ssho.orishchukfintechlab.data.model.ImageData
 
 class GifsLikedRepository(

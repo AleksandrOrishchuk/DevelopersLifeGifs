@@ -7,6 +7,7 @@ import androidx.lifecycle.*
 import com.ssho.orishchukfintechlab.R
 import com.ssho.orishchukfintechlab.domain.model.GifsBrowserDomainData
 import com.ssho.orishchukfintechlab.domain.usecase.*
+import com.ssho.orishchukfintechlab.ui.model.GifsBrowserUi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

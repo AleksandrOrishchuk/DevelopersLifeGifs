@@ -1,4 +1,4 @@
-package com.ssho.orishchukfintechlab.ui
+package com.ssho.orishchukfintechlab.ui.model
 
 data class GifsBrowserUi(
     val currentGifsUrl: String = "",

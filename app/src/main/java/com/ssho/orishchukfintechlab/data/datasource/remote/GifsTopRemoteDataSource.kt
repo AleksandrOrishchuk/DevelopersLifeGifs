@@ -1,16 +1,15 @@
-package com.ssho.orishchukfintechlab.data
+package com.ssho.orishchukfintechlab.data.datasource.remote
 
+import com.ssho.orishchukfintechlab.data.ImageDataMapper
 import com.ssho.orishchukfintechlab.data.api.DevelopersLifeApi
 import com.ssho.orishchukfintechlab.data.api.ImageApiDTO
 
-class GifsLatestRemoteDataSource(
+class GifsTopRemoteDataSource(
     private val developersLifeApi: DevelopersLifeApi,
     imageDataMapper: ImageDataMapper
-) : GifsRemoteDataSourceImpl(
-    imageDataMapper = imageDataMapper
-) {
+) : GifsAbstractRemoteDataSource(imageDataMapper) {
     override suspend fun fetchImageApiDTO(): List<ImageApiDTO> {
-        val imageApiListDto = developersLifeApi.fetchLatestImageData(super.fetchingPage.toString())
+        val imageApiListDto = developersLifeApi.fetchTopImageData(super.fetchingPage.toString())
         return imageApiListDto.result
     }
 }

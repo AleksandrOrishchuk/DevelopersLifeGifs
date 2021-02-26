@@ -1,4 +1,4 @@
-package com.ssho.orishchukfintechlab.data
+package com.ssho.orishchukfintechlab.data.repository
 
 import com.ssho.orishchukfintechlab.data.model.ImageData
 
